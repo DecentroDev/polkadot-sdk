@@ -26,7 +26,8 @@ hex = { workspace = true }
 impl-trait-for-tuples = { workspace = true }
 log = { workspace = true }
 paste = { workspace = true }
-polkavm = { version = "0.19.0", default-features = false }
+polkavm = { git = "https://github.com/paritytech/polkavm.git", default-features = false }
+polkavm-common = { git = "https://github.com/paritytech/polkavm.git", default-features = false, optional = true }
 rlp = { workspace = true }
 scale-info = { features = ["derive"], workspace = true }
 serde = { features = [
@@ -120,6 +121,7 @@ runtime-benchmarks = [
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-transaction-payment/runtime-benchmarks",
 	"pallet-utility/runtime-benchmarks",
+	"polkavm-common/alloc",
 	"sp-consensus-aura",
 	"sp-consensus-babe",
 	"sp-consensus-slots",

@@ -24,7 +24,8 @@
 //! we define this simple definition of a contract that can be passed to `create_code` that
 //! compiles it down into a `WasmModule` that can be used as a contract's code.
 
-use alloc::vec::Vec;
+use crate::limits;
+use alloc::{fmt::Write, string::ToString, vec::Vec};
 use pallet_revive_fixtures::bench as bench_fixtures;
 use sp_core::H256;
 use sp_io::hashing::keccak_256;
@@ -47,9 +48,38 @@ impl WasmModule {
 		Self::new(bench_fixtures::dummy_unique(replace_with))
 	}
 
-	/// A contract code of specified sizte that does nothing.
-	pub fn sized(_size: u32) -> Self {
-		Self::dummy()
+	/// A contract code of specified size that uses all its bytes for instructions but will return
+	/// immediately without breaking up the basic block when it returns.
+	///
+	/// All the basic blocks are maximum sized (only the first is important though). This is to
+	/// account for the fact that the interpreter will compile one basic block at a time even
+	/// when no code is executed. Hence this contract will trigger the compilation of a maximum
+	/// sized basic block and then return with its first instruction (by alling a diverging host
+	/// fn).
+	///
+	/// All the code will be put into the "call" export. Hence this code can be safely used for the
+	/// `instantiate_with_code` benchmark where no execution at all should be measured.
+	pub fn sized(size: u32) -> Self {
+		let instr_len = 3;
+		let mut text = "
+		pub @deploy:
+		ret
+		pub @call:
+		"
+		.to_string();
+		for i in 0..(size / instr_len) {
+			match i {
+				// return execution right away without breaking up basic block
+				// SENTINEL is a hard coded syscall that terminates execution
+				0 => write!(text, "ecalli {}\n", crate::SENTINEL).unwrap(),
+				i if i % (limits::code::BASIC_BLOCK_SIZE - 1) == 0 =>
+					text.push_str("fallthrough\n"),
+				_ => text.push_str("a0 = a1 + a2\n"),
+			}
+		}
+		text.push_str("ret\n");
+		let code = polkavm_common::assembler::assemble(&text).unwrap();
+		Self::new(code)
 	}
 
 	/// A contract code that calls the "noop" host function in a loop depending in the input.

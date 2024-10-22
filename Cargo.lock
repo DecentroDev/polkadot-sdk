@@ -14826,7 +14826,8 @@ dependencies = [
  "pallet-utility 28.0.0",
  "parity-scale-codec",
  "paste",
- "polkavm 0.19.0",
+ "polkavm 0.20.0",
+ "polkavm-common 0.20.0",
  "pretty_assertions",
  "rlp 0.6.1",
  "scale-info",
@@ -19912,15 +19913,14 @@ dependencies = [
 
 [[package]]
 name = "polkavm"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8379bb48ff026aa8ae0645ea45f27920bfd21c82b2e82ed914224bb233d59f83"
+version = "0.20.0"
+source = "git+https://github.com/paritytech/polkavm.git#5de83b4ea410118218683f756aa20474c7cd5419"
 dependencies = [
  "libc",
  "log",
- "polkavm-assembler 0.19.0",
- "polkavm-common 0.19.0",
- "polkavm-linux-raw 0.19.0",
+ "polkavm-assembler 0.20.0",
+ "polkavm-common 0.20.0",
+ "polkavm-linux-raw 0.20.0",
 ]
 
 [[package]]
@@ -19952,9 +19952,8 @@ dependencies = [
 
 [[package]]
 name = "polkavm-assembler"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57513b596cf0bafb052dab48e9c168f473c35f7522e17f70cc9f96603012d9b7"
+version = "0.20.0"
+source = "git+https://github.com/paritytech/polkavm.git#5de83b4ea410118218683f756aa20474c7cd5419"
 dependencies = [
  "log",
 ]
@@ -19993,9 +19992,14 @@ name = "polkavm-common"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a972bd305ba8cbf0de79951d6d49d2abfad47c277596be5a2c6a0924a163abbd"
+
+[[package]]
+name = "polkavm-common"
+version = "0.20.0"
+source = "git+https://github.com/paritytech/polkavm.git#5de83b4ea410118218683f756aa20474c7cd5419"
 dependencies = [
  "log",
- "polkavm-assembler 0.19.0",
+ "polkavm-assembler 0.20.0",
 ]
 
 [[package]]
@@ -20204,9 +20208,8 @@ checksum = "23eff02c070c70f31878a3d915e88a914ecf3e153741e2fb572dde28cce20fde"
 
 [[package]]
 name = "polkavm-linux-raw"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "136ae072ab6fa38e584a06d12b1b216cff19f54d5cd202a8f8c5ec2e92e7e4bb"
+version = "0.20.0"
+source = "git+https://github.com/paritytech/polkavm.git#5de83b4ea410118218683f756aa20474c7cd5419"
 
 [[package]]
 name = "polling"

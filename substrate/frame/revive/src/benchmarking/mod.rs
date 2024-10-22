@@ -266,7 +266,7 @@ mod benchmarks {
 	// call_with_code_per_byte(0)`.
 	#[benchmark(pov_mode = Measured)]
 	fn call_with_code_per_byte(
-		c: Linear<0, { limits::code::BLOB_BYTES }>,
+		c: Linear<0, { limits::code::STATIC_MEMORY_BYTES / limits::code::BYTES_PER_INSTRUCTION }>,
 	) -> Result<(), BenchmarkError> {
 		let instance =
 			Contract::<T>::with_caller(whitelisted_caller(), WasmModule::sized(c), vec![])?;
@@ -290,7 +290,7 @@ mod benchmarks {
 	// `i`: Size of the input in bytes.
 	#[benchmark(pov_mode = Measured)]
 	fn instantiate_with_code(
-		c: Linear<0, { limits::code::BLOB_BYTES }>,
+		c: Linear<0, { limits::code::STATIC_MEMORY_BYTES / limits::code::BYTES_PER_INSTRUCTION }>,
 		i: Linear<0, { limits::code::BLOB_BYTES }>,
 	) {
 		let input = vec![42u8; i as usize];
@@ -416,7 +416,9 @@ mod benchmarks {
 	// It creates a maximum number of metering blocks per byte.
 	// `c`: Size of the code in bytes.
 	#[benchmark(pov_mode = Measured)]
-	fn upload_code(c: Linear<0, { limits::code::BLOB_BYTES }>) {
+	fn upload_code(
+		c: Linear<0, { limits::code::STATIC_MEMORY_BYTES / limits::code::BYTES_PER_INSTRUCTION }>,
+	) {
 		let caller = whitelisted_caller();
 		T::Currency::set_balance(&caller, caller_funding::<T>());
 		let WasmModule { code, hash, .. } = WasmModule::sized(c);

@@ -4586,6 +4586,7 @@ dependencies = [
  "cumulus-primitives-core 0.7.0",
  "cumulus-relay-chain-interface",
  "futures",
+ "hex",
  "log",
  "parity-scale-codec",
  "sc-network",

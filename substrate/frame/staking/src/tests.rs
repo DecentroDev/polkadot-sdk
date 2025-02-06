@@ -3034,6 +3034,10 @@ fn retroactive_deferred_slashes_two_eras_before() {
 			1, // should be deferred for two eras, and applied at the beginning of era 3.
 		);
 
+		mock::start_active_era(3);
+		// Slashes not applied yet. Will apply in the next block after era starts.
+		advance_blocks(1);
+
 		assert!(matches!(
 			staking_events_since_last_call().as_slice(),
 			&[

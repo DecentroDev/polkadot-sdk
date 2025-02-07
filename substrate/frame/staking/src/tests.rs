@@ -3164,7 +3164,6 @@ fn staker_cannot_bail_deferred_slash() {
 }
 
 #[test]
-#[ignore] //fixme: cancel_deferred_slash broken
 fn remove_deferred() {
 	ExtBuilder::default().slash_defer_duration(2).build_and_execute(|| {
 		mock::start_active_era(1);
@@ -3176,7 +3175,8 @@ fn remove_deferred() {
 		let nominated_value = exposure.others.iter().find(|o| o.who == 101).unwrap().value;
 
 		// deferred to start of era 3.
-		on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(10)]);
+		let slash_fraction_one = Perbill::from_percent(10);
+		on_offence_now(&[offence_from(11, None)], &[slash_fraction_one]);
 
 		assert_eq!(asset::stakeable_balance::<Test>(&11), 1000);
 		assert_eq!(asset::stakeable_balance::<Test>(&101), 2000);
@@ -3185,16 +3185,48 @@ fn remove_deferred() {
 
 		// reported later, but deferred to start of era 3 as well.
 		System::reset_events();
-		on_offence_in_era(&[offence_from(11, None)], &[Perbill::from_percent(15)], 1);
+		let slash_fraction_two = Perbill::from_percent(15);
+		on_offence_in_era(&[offence_from(11, None)], &[slash_fraction_two], 1);
+
+		assert_eq!(
+			UnappliedSlashes::<Test>::iter_prefix(&3).collect::<Vec<_>>(),
+			vec![
+				(
+					(11, slash_fraction_one, 0),
+					UnappliedSlash {
+						validator: 11,
+						own: 100,
+						others: bounded_vec![(101, 12)],
+						reporter: None,
+						payout: 5
+					}
+				),
+				(
+					(11, slash_fraction_two, 0),
+					UnappliedSlash {
+						validator: 11,
+						own: 50,
+						others: bounded_vec![(101, 7)],
+						reporter: None,
+						payout: 6
+					}
+				),
+			]
+		);
 
 		// fails if empty
-		/*assert_noop!(
+		assert_noop!(
 			Staking::cancel_deferred_slash(RuntimeOrigin::root(), 1, vec![]),
 			Error::<Test>::EmptyTargets
-		);*/
+		);
 
-		// cancel one of them.
-		// assert_ok!(Staking::cancel_deferred_slash(RuntimeOrigin::root(), 4, vec![0]));
+		// cancel the slash with 10%.
+		assert_ok!(Staking::cancel_deferred_slash(
+			RuntimeOrigin::root(),
+			3,
+			vec![(11, slash_fraction_one, 0)]
+		));
+		assert_eq!(UnappliedSlashes::<Test>::iter_prefix(&3).count(), 1);
 
 		assert_eq!(asset::stakeable_balance::<Test>(&11), 1000);
 		assert_eq!(asset::stakeable_balance::<Test>(&101), 2000);
@@ -3214,6 +3246,7 @@ fn remove_deferred() {
 			&[
 				Event::SlashReported { validator: 11, slash_era: 1, .. },
 				Event::SlashComputed { offence_era: 1, slash_era: 3, offender: 11, page: 0 },
+				Event::SlashCancelled { slash_era: 3, slash_key: (11, slash_fraction_one, 0), payout: 5 },
 				..,
 				Event::Slashed { staker: 11, amount: 50 },
 				Event::Slashed { staker: 101, amount: 7 }
@@ -3221,7 +3254,7 @@ fn remove_deferred() {
 		));
 
 		let slash_10 = Perbill::from_percent(10);
-		let slash_15 = Perbill::from_percent(15);
+		let slash_15 = slash_fraction_two;
 		let initial_slash = slash_10 * nominated_value;
 
 		let total_slash = slash_15 * nominated_value;

@@ -1093,6 +1093,12 @@ pub mod pallet {
 			offender: T::AccountId,
 			page: u32,
 		},
+		/// An unapplied slash has been cancelled.
+		SlashCancelled {
+			slash_era: EraIndex,
+			slash_key: (T::AccountId, Perbill, u32),
+			payout: BalanceOf<T>,
+		},
 	}
 
 	#[pallet::error]
@@ -1999,7 +2005,15 @@ pub mod pallet {
 			ensure!(!slash_keys.is_empty(), Error::<T>::EmptyTargets);
 
 			// Remove the unapplied slashes.
-			let _ = slash_keys.into_iter().map(|i| UnappliedSlashes::<T>::remove(&era, i));
+			slash_keys.into_iter().for_each(|i| {
+				UnappliedSlashes::<T>::take(&era, &i).map(|unapplied_slash| {
+					Self::deposit_event(Event::<T>::SlashCancelled {
+						slash_era: era,
+						slash_key: i,
+						payout: unapplied_slash.payout,
+					});
+				});
+			});
 			Ok(())
 		}
 

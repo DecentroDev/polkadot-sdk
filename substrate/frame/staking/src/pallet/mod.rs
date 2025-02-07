@@ -1126,8 +1126,6 @@ pub mod pallet {
 		InvalidEraToReward,
 		/// Invalid number of nominations.
 		InvalidNumberOfNominations,
-		/// Items are not sorted and unique.
-		NotSortedAndUnique,
 		/// Rewards for this era have already been claimed for this validator.
 		AlreadyClaimed,
 		/// No nominators exist on this page.
@@ -1981,34 +1979,27 @@ pub mod pallet {
 			Ok(())
 		}
 
-		/// Cancel enactment of a deferred slash.
+		/// Cancels scheduled slashes for a given era before they are applied.
 		///
-		/// Can be called by the `T::AdminOrigin`.
+		/// This function allows `T::AdminOrigin` to selectively remove pending slashes from
+		/// the `UnappliedSlashes` storage, preventing their enactment.
 		///
-		/// Parameters: era and indices of the slashes for that era to kill.
+		/// ## Parameters
+		/// - `era`: The staking era for which slashes were deferred.
+		/// - `slash_keys`: A list of slash keys identifying the slashes to remove. This is a tuple
+		/// of `(stash, slash_fraction, page_index)`.
 		#[pallet::call_index(17)]
-		#[pallet::weight(T::WeightInfo::cancel_deferred_slash(slash_indices.len() as u32))]
+		#[pallet::weight(T::WeightInfo::cancel_deferred_slash(slash_keys.len() as u32))]
 		pub fn cancel_deferred_slash(
 			origin: OriginFor<T>,
-			_era: EraIndex,
-			slash_indices: Vec<u32>,
+			era: EraIndex,
+			slash_keys: Vec<(T::AccountId, Perbill, u32)>,
 		) -> DispatchResult {
 			T::AdminOrigin::ensure_origin(origin)?;
+			ensure!(!slash_keys.is_empty(), Error::<T>::EmptyTargets);
 
-			ensure!(!slash_indices.is_empty(), Error::<T>::EmptyTargets);
-			ensure!(is_sorted_and_unique(&slash_indices), Error::<T>::NotSortedAndUnique);
-
-			// todo(ank4n): Refactor this to take vec of (stash, page), and kill `UnappliedSlashes`.
-			// let mut unapplied = UnappliedSlashes::<T>::get(&era);
-			// let last_item = slash_indices[slash_indices.len() - 1];
-			// ensure!((last_item as usize) < unapplied.len(), Error::<T>::InvalidSlashIndex);
-			//
-			// for (removed, index) in slash_indices.into_iter().enumerate() {
-			// 	let index = (index as usize) - removed;
-			// 	unapplied.remove(index);
-			// }
-			//
-			// UnappliedSlashes::<T>::insert(&era, &unapplied);
+			// Remove the unapplied slashes.
+			let _ = slash_keys.into_iter().map(|i| UnappliedSlashes::<T>::remove(&era, i));
 			Ok(())
 		}
 
@@ -2570,9 +2561,4 @@ pub mod pallet {
 			Ok(Pays::No.into())
 		}
 	}
-}
-
-/// Check that list is sorted and has no duplicates.
-fn is_sorted_and_unique(list: &[u32]) -> bool {
-	list.windows(2).all(|w| w[0] < w[1])
 }

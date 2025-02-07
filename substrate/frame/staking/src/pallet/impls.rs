@@ -35,7 +35,7 @@ use frame_system::{pallet_prelude::BlockNumberFor, RawOrigin};
 use pallet_session::historical;
 use sp_runtime::{
 	traits::{
-		Bounded, CheckedAdd, Convert, One, SaturatedConversion, Saturating, StaticLookup, Zero,
+		Bounded, CheckedAdd, Convert, SaturatedConversion, Saturating, StaticLookup, Zero,
 	},
 	ArithmeticError, DispatchResult, Perbill, Percent,
 };
@@ -1698,20 +1698,12 @@ impl<T: Config> pallet_session::SessionManager<T::AccountId> for Pallet<T> {
 impl<T: Config> historical::SessionManager<T::AccountId, ()> for Pallet<T> {
 	fn new_session(new_index: SessionIndex) -> Option<Vec<(T::AccountId, ())>> {
 		<Self as pallet_session::SessionManager<_>>::new_session(new_index).map(|validators| {
-			let current_era = CurrentEra::<T>::get()
-				// Must be some as a new era has been created.
-				.unwrap_or(0);
-
 			validators.into_iter().map(|v| (v, ())).collect()
 		})
 	}
 	fn new_session_genesis(new_index: SessionIndex) -> Option<Vec<(T::AccountId, ())>> {
 		<Self as pallet_session::SessionManager<_>>::new_session_genesis(new_index).map(
 			|validators| {
-				let current_era = CurrentEra::<T>::get()
-					// Must be some as a new era has been created.
-					.unwrap_or(0);
-
 				validators.into_iter().map(|v| (v, ())).collect()
 			},
 		)
@@ -2353,6 +2345,8 @@ impl<T: Config> Pallet<T> {
 	///
 	/// -- SHOULD ONLY BE CALLED AT THE END OF A GIVEN BLOCK.
 	pub fn ensure_snapshot_metadata_state(now: BlockNumberFor<T>) -> Result<(), TryRuntimeError> {
+		use sp_runtime::traits::One;
+
 		let next_election = Self::next_election_prediction(now);
 		let pages = Self::election_pages().saturated_into::<BlockNumberFor<T>>();
 		let election_prep_start = next_election - pages;

@@ -3366,9 +3366,6 @@ fn non_slashable_offence_disables_validator() {
 			mock::start_active_era(1);
 			assert_eq_uvec!(Session::validators(), vec![11, 21, 31, 41, 51, 201, 202]);
 
-			let exposure_11 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &21);
-
 			// offence with no slash associated
 			on_offence_now(&[offence_from(11, None)], &[Perbill::zero()]);
 
@@ -3421,9 +3418,6 @@ fn slashing_independent_of_disabling_validator() {
 		.build_and_execute(|| {
 			mock::start_active_era(1);
 			assert_eq_uvec!(Session::validators(), vec![11, 21, 31, 41, 51]);
-
-			let exposure_11 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &21);
 
 			let now = ActiveEra::<Test>::get().unwrap().index;
 
@@ -3502,11 +3496,6 @@ fn offence_threshold_doesnt_plan_new_era() {
 
 			// we have 4 validators and an offending validator threshold of 1/3,
 			// even if the third validator commits an offence a new era should not be forced
-
-			let exposure_11 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &21);
-			let exposure_31 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &31);
-
 			on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(50)]);
 
 			// 11 should be disabled because the byzantine threshold is 1
@@ -3543,9 +3532,6 @@ fn disabled_validators_are_kept_disabled_for_whole_era() {
 			mock::start_active_era(1);
 			assert_eq_uvec!(Session::validators(), vec![11, 21, 31, 41, 51, 201, 202]);
 			assert_eq!(<Test as Config>::SessionsPerEra::get(), 3);
-
-			let exposure_11 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(ActiveEra::<Test>::get().unwrap().index, &21);
 
 			on_offence_now(&[offence_from(21, None)], &[Perbill::from_percent(25)]);
 
@@ -3677,8 +3663,6 @@ fn zero_slash_keeps_nominators() {
 			mock::start_active_era(1);
 
 			assert_eq!(asset::stakeable_balance::<Test>(&11), 1000);
-
-			let exposure = Staking::eras_stakers(active_era(), &11);
 			assert_eq!(asset::stakeable_balance::<Test>(&101), 2000);
 
 			on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(0)]);
@@ -8170,10 +8154,6 @@ fn reenable_lower_offenders_mock() {
 			mock::start_active_era(1);
 			assert_eq_uvec!(Session::validators(), vec![11, 21, 31, 41, 51, 201, 202]);
 
-			let exposure_11 = Staking::eras_stakers(Staking::active_era().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(Staking::active_era().unwrap().index, &21);
-			let exposure_31 = Staking::eras_stakers(Staking::active_era().unwrap().index, &31);
-
 			// offence with a low slash
 			on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(10)]);
 			on_offence_now(&[offence_from(21, None)], &[Perbill::from_percent(20)]);
@@ -8244,10 +8224,6 @@ fn do_not_reenable_higher_offenders_mock() {
 		.build_and_execute(|| {
 			mock::start_active_era(1);
 			assert_eq_uvec!(Session::validators(), vec![11, 21, 31, 41, 51, 201, 202]);
-
-			let exposure_11 = Staking::eras_stakers(Staking::active_era().unwrap().index, &11);
-			let exposure_21 = Staking::eras_stakers(Staking::active_era().unwrap().index, &21);
-			let exposure_31 = Staking::eras_stakers(Staking::active_era().unwrap().index, &31);
 
 			// offence with a major slash
 			on_offence_now(

@@ -1116,8 +1116,6 @@ pub mod pallet {
 		EmptyTargets,
 		/// Duplicate index.
 		DuplicateIndex,
-		/// Slash record index out of bounds.
-		InvalidSlashIndex,
 		/// Cannot have a validator or nominator role, with value less than the minimum defined by
 		/// governance (see `MinValidatorBond` and `MinNominatorBond`). If unbonding is the
 		/// intention, `chill` first to remove one's role as validator/nominator.

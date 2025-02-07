@@ -3271,43 +3271,45 @@ fn remove_deferred() {
 }
 
 #[test]
-#[ignore]
 fn remove_multi_deferred() {
-	ExtBuilder::default().slash_defer_duration(2).build_and_execute(|| {
-		mock::start_active_era(1);
+	ExtBuilder::default()
+		.slash_defer_duration(2)
+		.validator_count(4)
+		.set_status(41, StakerStatus::Validator)
+		.set_status(51, StakerStatus::Validator)
+		.build_and_execute(|| {
+			mock::start_active_era(1);
 
-		assert_eq!(asset::stakeable_balance::<Test>(&11), 1000);
-		assert_eq!(asset::stakeable_balance::<Test>(&101), 2000);
+			assert_eq!(asset::stakeable_balance::<Test>(&11), 1000);
+			assert_eq!(asset::stakeable_balance::<Test>(&101), 2000);
 
-		on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(10)]);
+			on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(10)]);
 
-		on_offence_now(&[offence_from(21, None)], &[Perbill::from_percent(10)]);
+			on_offence_now(&[offence_from(21, None)], &[Perbill::from_percent(10)]);
 
-		on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(25)]);
+			on_offence_now(&[offence_from(11, None)], &[Perbill::from_percent(25)]);
 
-		// fixme: following are not validators. Exposure is ignored.
-		on_offence_now(&[offence_from(42, None)], &[Perbill::from_percent(25)]);
+			on_offence_now(&[offence_from(41, None)], &[Perbill::from_percent(25)]);
 
-		on_offence_now(&[offence_from(69, None)], &[Perbill::from_percent(25)]);
+			on_offence_now(&[offence_from(51, None)], &[Perbill::from_percent(25)]);
 
-		println!("{:?}", UnappliedSlashes::<Test>::iter_prefix(&3).collect::<Vec<_>>());
-		// assert_eq!(UnappliedSlashes::<Test>::iter_prefix(&3).count(), 5);
+			// there are 5 slashes to be applied in era 3.
+			assert_eq!(UnappliedSlashes::<Test>::iter_prefix(&3).count(), 5);
 
-		// fails if bad index
-		/*assert_noop!(
-			Staking::cancel_deferred_slash(RuntimeOrigin::root(), 1, vec![1, 2, 3, 4, 5]),
-			Error::<Test>::InvalidSlashIndex
-		);*/
+			// lets cancel 3 of them.
+			assert_ok!(Staking::cancel_deferred_slash(
+				RuntimeOrigin::root(),
+				3,
+				vec![(11, Perbill::from_percent(10), 0), (11, Perbill::from_percent(25), 0), (51, Perbill::from_percent(25), 0),]
+			));
 
-		// assert_ok!(Staking::cancel_deferred_slash(RuntimeOrigin::root(), 4, vec![0, 2, 4]));
-
-		/* fixme
-		 let slashes = UnappliedSlashes::<Test>::get(&4);
-		assert_eq!(slashes.len(), 2);
-		assert_eq!(slashes[0].validator, 21);
-		assert_eq!(slashes[1].validator, 42);
-		*/
-	})
+			let slashes = UnappliedSlashes::<Test>::iter_prefix(&3).collect::<Vec<_>>();
+			assert_eq!(slashes.len(), 2);
+			// the first item in the remaining slashes belongs to validator 41.
+			assert_eq!(slashes[0].0, (41, Perbill::from_percent(25), 0));
+			// the second and last item in the remaining slashes belongs to validator 21.
+			assert_eq!(slashes[1].0, (21, Perbill::from_percent(10), 0));
+		})
 }
 
 #[test]

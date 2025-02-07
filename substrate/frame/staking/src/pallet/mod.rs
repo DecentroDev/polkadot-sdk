@@ -1116,6 +1116,8 @@ pub mod pallet {
 		EmptyTargets,
 		/// Duplicate index.
 		DuplicateIndex,
+		/// Slash record not found.
+		InvalidSlashRecord,
 		/// Cannot have a validator or nominator role, with value less than the minimum defined by
 		/// governance (see `MinValidatorBond` and `MinNominatorBond`). If unbonding is the
 		/// intention, `chill` first to remove one's role as validator/nominator.
@@ -1170,6 +1172,8 @@ pub mod pallet {
 		CannotReapStash,
 		/// The stake of this account is already migrated to `Fungible` holds.
 		AlreadyMigrated,
+		/// Era not yet started.
+		EraNotStarted,
 	}
 
 	#[pallet::hooks]
@@ -2570,6 +2574,43 @@ pub mod pallet {
 			Self::do_migrate_currency(&stash)?;
 
 			// Refund the transaction fee if successful.
+			Ok(Pays::No.into())
+		}
+
+		/// Manually applies a deferred slash for a given era.
+		///
+		/// Normally, slashes are automatically applied shortly after the start of the `slash_era`.
+		/// This function exists as a **fallback mechanism** in case slashes were not applied due to
+		/// unexpected reasons. It allows anyone to manually apply an unapplied slash.
+		///
+		/// ## Parameters
+		/// - `slash_era`: The staking era in which the slash was originally scheduled.
+		/// - `slash_key`: A unique identifier for the slash, represented as a tuple:
+		///   - `stash`: The stash account of the validator being slashed.
+		///   - `slash_fraction`: The fraction of the stake that was slashed.
+		///   - `page_index`: The index of the exposure page being processed.
+		///
+		/// ## Behavior
+		/// - The function is **permissionless**—anyone can call it.
+		/// - The `slash_era` **must be the current era or a past era**. If it is in the future, the
+		///   call fails with `EraNotStarted`.
+		/// - The fee is waived if the slash is successfully applied.
+		// TODO(ank4n): Benchmark and update weight.
+		// Improvement: this can be called via OCW tasks.
+		#[pallet::call_index(31)]
+		#[pallet::weight(Weight::zero())]
+		pub fn apply_slash(
+			origin: OriginFor<T>,
+			slash_era: EraIndex,
+			slash_key: (T::AccountId, Perbill, u32),
+		) -> DispatchResultWithPostInfo {
+			let _ = ensure_signed(origin)?;
+			let active_era = ActiveEra::<T>::get().map(|a| a.index).unwrap_or_default();
+			ensure!(slash_era <= active_era, Error::<T>::EraNotStarted);
+			let unapplied_slash = UnappliedSlashes::<T>::get(&slash_era, &slash_key)
+				.ok_or(Error::<T>::InvalidSlashRecord)?;
+			slashing::apply_slash::<T>(unapplied_slash, slash_era);
+
 			Ok(Pays::No.into())
 		}
 	}

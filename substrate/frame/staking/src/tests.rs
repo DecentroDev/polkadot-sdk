@@ -3248,13 +3248,13 @@ fn remove_deferred() {
 				Event::SlashComputed { offence_era: 1, slash_era: 3, offender: 11, page: 0 },
 				Event::SlashCancelled {
 					slash_era: 3,
-					slash_key: (11, slash_fraction_one, 0),
+					slash_key: (11, fraction, 0),
 					payout: 5
 				},
 				..,
 				Event::Slashed { staker: 11, amount: 50 },
 				Event::Slashed { staker: 101, amount: 7 }
-			]
+			] if fraction == slash_fraction_one
 		));
 
 		let slash_10 = Perbill::from_percent(10);
@@ -3300,7 +3300,11 @@ fn remove_multi_deferred() {
 			assert_ok!(Staking::cancel_deferred_slash(
 				RuntimeOrigin::root(),
 				3,
-				vec![(11, Perbill::from_percent(10), 0), (11, Perbill::from_percent(25), 0), (51, Perbill::from_percent(25), 0),]
+				vec![
+					(11, Perbill::from_percent(10), 0),
+					(11, Perbill::from_percent(25), 0),
+					(51, Perbill::from_percent(25), 0),
+				]
 			));
 
 			let slashes = UnappliedSlashes::<Test>::iter_prefix(&3).collect::<Vec<_>>();

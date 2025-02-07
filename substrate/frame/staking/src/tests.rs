@@ -3246,7 +3246,11 @@ fn remove_deferred() {
 			&[
 				Event::SlashReported { validator: 11, slash_era: 1, .. },
 				Event::SlashComputed { offence_era: 1, slash_era: 3, offender: 11, page: 0 },
-				Event::SlashCancelled { slash_era: 3, slash_key: (11, slash_fraction_one, 0), payout: 5 },
+				Event::SlashCancelled {
+					slash_era: 3,
+					slash_key: (11, slash_fraction_one, 0),
+					payout: 5
+				},
 				..,
 				Event::Slashed { staker: 11, amount: 50 },
 				Event::Slashed { staker: 101, amount: 7 }

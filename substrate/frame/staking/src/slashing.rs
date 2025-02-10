@@ -514,7 +514,7 @@ pub(crate) fn add_offending_validator<T: Config>(
 						T::SessionInterface::disable_validator(offender_idx);
 						// Emit event that a validator got disabled
 						<Pallet<T>>::deposit_event(super::Event::<T>::ValidatorDisabled {
-							stash: params.stash.clone(),
+							stash: stash.clone(),
 						});
 					}
 				},

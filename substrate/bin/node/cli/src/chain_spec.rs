@@ -48,6 +48,9 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
 const STASH: Balance = ENDOWMENT / 1000;
 
+const DEFAULT_VALIDATOR_COUNT: u32 = 300;
+const DEFAULT_NOMINATOR_COUNT: u32 = 22_500;
+
 /// Node `ChainSpec` extensions.
 ///
 /// Additional parameters for some Substrate core modules,
@@ -359,10 +362,10 @@ pub fn testnet_genesis(
 	const MAX_COLLECTIVE_SIZE: usize = 50;
 	let dev_stakers = if cfg!(feature = "staking-playground") {
 		let random_validators =
-			std::option_env!("VALIDATORS").map(|s| s.parse::<u32>().unwrap()).unwrap_or(100);
+			std::option_env!("VALIDATORS").map(|s| s.parse::<u32>().unwrap()).unwrap_or(DEFAULT_VALIDATOR_COUNT);
 		let random_nominators = std::option_env!("NOMINATORS")
 			.map(|s| s.parse::<u32>().unwrap())
-			.unwrap_or(3000);
+			.unwrap_or(DEFAULT_NOMINATOR_COUNT);
 		Some((random_validators, random_nominators))
 	} else {
 		None
@@ -392,8 +395,8 @@ pub fn testnet_genesis(
 				.collect::<Vec<_>>(),
 		},
 		"staking": {
-			"validatorCount": std::option_env!("VALIDATORS").map(|v| v.parse::<u32>().unwrap()).unwrap_or(10),
-			"minimumValidatorCount": 10,
+			"validatorCount": std::option_env!("VALIDATORS").map(|v| v.parse::<u32>().unwrap()).unwrap_or(DEFAULT_VALIDATOR_COUNT),
+			"minimumValidatorCount": 100,
 			"invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
 			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),

@@ -924,7 +924,8 @@ pub(crate) mod multi_block_impls {
 	use pallet_election_provider_multi_phase as multi_phase;
 
 	parameter_types! {
-		pub const Pages: u32 = 64;
+		// TODO(niklasad1): maybe feature-gate this?
+		pub const Pages: u32 = 8;
 		// nominators snapshot size
 		pub VoterSnapshotPerBlock: u32 = 22500 / Pages::get();
 		// validator snapshot size

@@ -988,13 +988,6 @@ pub mod pallet {
 			staker: T::AccountId,
 			amount: BalanceOf<T>,
 		},
-		/// A slash for the given validator, for the given percentage of their stake, at the given
-		/// era as been reported.
-		SlashReported {
-			validator: T::AccountId,
-			fraction: Perbill,
-			slash_era: EraIndex,
-		},
 		/// An old slashing report from a prior era was discarded because it could
 		/// not be processed.
 		OldSlashingReportDiscarded {
@@ -1085,6 +1078,13 @@ pub mod pallet {
 		PagedElectionProceeded {
 			page: PageIndex,
 			result: Result<u32, u32>,
+		},
+		/// An offence for the given validator, for the given percentage of their stake, at the given
+		/// era as been reported.
+		OffenceReported {
+			offence_era: EraIndex,
+			validator: T::AccountId,
+			fraction: Perbill,
 		},
 		/// An offence has been processed and the corresponding slash has been computed.
 		SlashComputed {

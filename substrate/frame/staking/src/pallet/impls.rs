@@ -1811,10 +1811,10 @@ where
 				continue;
 			};
 
-			Self::deposit_event(Event::<T>::SlashReported {
+			Self::deposit_event(Event::<T>::OffenceReported {
 				validator: validator.clone(),
 				fraction: *slash_fraction,
-				slash_era: offence_era,
+				offence_era,
 			});
 
 			// add offending validator to the set of offenders.

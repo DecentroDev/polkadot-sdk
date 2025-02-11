@@ -9124,17 +9124,23 @@ mod paged_slashing {
 	}
 
 	#[test]
-	fn validator_slashed_in_multi_block() {
-		// Ensure each validator is slashed only once.
-		// Page slashed which is not last page should have val_slashed = 0.
-		// Ensure all nominators are slashed and only once.
+	fn multiple_offence_eras_are_maintained() {
+		// Multiple offence eras are maintained in the queue.
+		// Older offence era is processed first.
+		// Era is removed from queue once all offences for that era is processed.
+
+		// another offence reported for the same (validator, era) while first offence is in process,
+		// should not overwrite the first offence.
+
+		// second offence for the same (validator, era) after first unprocessed offence just
+		// overwrites the first offence.
+
+		// if second offence is of lower perbill, it is ignored.
+		unimplemented!()
 	}
 
 	#[test]
-	fn small_validator_slashed_in_single_block() {
-		// for single paged exposure
+	fn validator_with_no_exposure_slashed() {
+		unimplemented!()
 	}
-
-	#[test]
-	fn validator_with_no_exposure_slashed() {}
 }

@@ -9091,7 +9091,6 @@ mod paged_slashing {
 				// total of 4 unapplied slash.
 				assert_eq!(UnappliedSlashes::<Test>::iter_prefix(&4).collect::<Vec<_>>().len(), 4);
 
-
 				// Checkpoint 4: lets verify the application of slashes in multiple blocks.
 				// advance to era 4.
 				mock::start_active_era(4);
@@ -9113,7 +9112,7 @@ mod paged_slashing {
 				// all slashes are applied.
 				assert_eq!(UnappliedSlashes::<Test>::iter_prefix(&4).collect::<Vec<_>>().len(), 0);
 
-				// ensure all stakers are slashed.
+				// ensure all stakers are slashed correctly.
 				assert_eq!(asset::staked::<Test>(&11), 1000 - 100);
 
 				for i in 0..200 {

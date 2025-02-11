@@ -1079,8 +1079,8 @@ pub mod pallet {
 			page: PageIndex,
 			result: Result<u32, u32>,
 		},
-		/// An offence for the given validator, for the given percentage of their stake, at the given
-		/// era as been reported.
+		/// An offence for the given validator, for the given percentage of their stake, at the
+		/// given era as been reported.
 		OffenceReported {
 			offence_era: EraIndex,
 			validator: T::AccountId,

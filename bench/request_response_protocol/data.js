@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739220450083,
+  "lastUpdate": 1739345194489,
   "repoUrl": "https://github.com/paritytech/polkadot-sdk",
   "entries": {
     "request_response_protocol": [
@@ -11339,6 +11339,114 @@ window.BENCHMARK_DATA = {
             "name": "request_response_protocol/litep2p/serially/16MB",
             "value": 2645787474,
             "range": "± 15877082",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "gui.thiolliere@gmail.com",
+            "name": "Guillaume Thiolliere",
+            "username": "gui1117"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6786bbcba95e1c2cc634f38d7276c077f8087f4a",
+          "message": "Warn about cargo remote not copying hidden file by default (#7429)\n\nadd a warning about hidden file not transfered.\n\ncargo remote is not really configurable so I just use my own fork for\nnow: https://github.com/sgeisler/cargo-remote/pull/25",
+          "timestamp": "2025-02-12T06:38:10Z",
+          "tree_id": "7f6cf22c06218f727ea8421253c26cda6d320e3e",
+          "url": "https://github.com/paritytech/polkadot-sdk/commit/6786bbcba95e1c2cc634f38d7276c077f8087f4a"
+        },
+        "date": 1739345177796,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "request_response_protocol/libp2p/serially/64B",
+            "value": 18900931,
+            "range": "± 132617",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/512B",
+            "value": 19082833,
+            "range": "± 184005",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/4KB",
+            "value": 20689832,
+            "range": "± 135906",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/64KB",
+            "value": 24548273,
+            "range": "± 149856",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/256KB",
+            "value": 55982067,
+            "range": "± 859599",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/2MB",
+            "value": 347566093,
+            "range": "± 6140824",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/libp2p/serially/16MB",
+            "value": 2325348952,
+            "range": "± 35892907",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/64B",
+            "value": 15016623,
+            "range": "± 98951",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/512B",
+            "value": 15192497,
+            "range": "± 157532",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/4KB",
+            "value": 15689665,
+            "range": "± 80108",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/64KB",
+            "value": 20163073,
+            "range": "± 173298",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/256KB",
+            "value": 50944860,
+            "range": "± 592886",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/2MB",
+            "value": 312717744,
+            "range": "± 2065648",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "request_response_protocol/litep2p/serially/16MB",
+            "value": 2482403153,
+            "range": "± 15653946",
             "unit": "ns/iter"
           }
         ]

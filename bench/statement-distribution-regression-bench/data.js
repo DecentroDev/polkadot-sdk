@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739284708590,
+  "lastUpdate": 1739345779861,
   "repoUrl": "https://github.com/paritytech/polkadot-sdk",
   "entries": {
     "statement-distribution-regression-bench": [
@@ -33039,6 +33039,50 @@ window.BENCHMARK_DATA = {
           {
             "name": "test-environment",
             "value": 0.04569635895799995,
+            "unit": "seconds"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "gui.thiolliere@gmail.com",
+            "name": "Guillaume Thiolliere",
+            "username": "gui1117"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6786bbcba95e1c2cc634f38d7276c077f8087f4a",
+          "message": "Warn about cargo remote not copying hidden file by default (#7429)\n\nadd a warning about hidden file not transfered.\n\ncargo remote is not really configurable so I just use my own fork for\nnow: https://github.com/sgeisler/cargo-remote/pull/25",
+          "timestamp": "2025-02-12T06:38:10Z",
+          "tree_id": "7f6cf22c06218f727ea8421253c26cda6d320e3e",
+          "url": "https://github.com/paritytech/polkadot-sdk/commit/6786bbcba95e1c2cc634f38d7276c077f8087f4a"
+        },
+        "date": 1739345763107,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Sent to peers",
+            "value": 127.95599999999999,
+            "unit": "KiB"
+          },
+          {
+            "name": "Received from peers",
+            "value": 106.39999999999996,
+            "unit": "KiB"
+          },
+          {
+            "name": "statement-distribution",
+            "value": 0.035643310868,
+            "unit": "seconds"
+          },
+          {
+            "name": "test-environment",
+            "value": 0.0454664498879999,
             "unit": "seconds"
           }
         ]
